@@ -21,10 +21,10 @@ headers = {
 
 
 @asynccontextmanager
-def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI):
     url = f"{WPP_API_URL}/api/{WPP_SESSION}/start-session"
 
-    payload = Dict[str, Any] = {
+    payload: Dict[str, Any] = {
         "webhook": "http://localhost:8000/webhook",
         "waitQrCode": False,
         "jsonSchemaWebhook": True
@@ -42,7 +42,7 @@ def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.post("/webhook")
+@app.post("/webhook")
 async def whatsapp_webhook(request: Request):
     body = await request.json()
     print(f"Received webhook: {body}")
@@ -62,7 +62,7 @@ async def whatsapp_webhook(request: Request):
 
 
 def send_wpp_message(phone: str, message: str, is_group: bool = False):
-    url = f"{WPP_API_URL}/send-message"
+    url = f"{WPP_API_URL}/api/{WPP_SESSION}/send-message"
 
     payload = {
         "phone": phone,
